@@ -15,9 +15,13 @@
     "@mui/icons-material": "^5.16.0",
     "@mui/material": "^5.16.0",
     "@react-spring/web": "^9.7.3",
+    "bootstrap": "^5.3.3",
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-tinder-card": "^1.6.4"
+    "react-tinder-card": "^1.6.4",
+    "reactstrap": "^9.2.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
