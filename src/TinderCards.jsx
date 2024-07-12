@@ -1,37 +1,67 @@
-import React, { useState, useRef } from 'react';
-import TinderCard from 'react-tinder-card';
-import './TinderCards.css';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import React, { useState, useEffect, useRef } from "react";
+import TinderCard from "react-tinder-card";
+import "./TinderCards.css";
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 const TinderCards = () => {
-  const [people, setPeople] = useState([
-    {
-      name: 'John Doe',
-      url: 'https://via.placeholder.com/300/FF0000/FFFFFF?text=John+Doe'
-    },
-    {
-      name: 'Jane Smith',
-      url: 'https://via.placeholder.com/300/00FF00/FFFFFF?text=Jane+Smith'
-    },
-    {
-      name: 'Sara Wilson',
-      url: 'https://via.placeholder.com/300/0000FF/FFFFFF?text=Sara+Wilson'
-    },
-    {
-      name: 'Mike Johnson',
-      url: 'https://via.placeholder.com/300/FFFF00/FFFFFF?text=Mike+Johnson'
-    }
-  ]);
+  const [people, setPeople] = useState([]);
+  const [currentPerson, setCurrentPerson] = useState(null);
+  const [loadedIndexes, setLoadedIndexes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [rightSwipeCount, setRightSwipeCount] = useState(0);
+  const [rightSwipedOutfits, setRightSwipedOutfits] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await fetch('http://localhost:4000/outfits');
+  //       const data = await response.json();
+  //       const formattedData = data.map(item => ({
+  //         name: 'Outfit', // Use a placeholder name or another field if available
+  //         url: item.img
+  //       }));
+  //       setPeople(formattedData);
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+  const fetchRandomPerson = async () => {
+    try {
+      setIsLoading(true);
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * 8090); // Adjust 10 according to your data size
+      } while (loadedIndexes.includes(randomIndex));
+
+      const response = await fetch(`http://localhost:4000/outfits/${randomIndex}`);
+      const data = await response.json();
+      const formattedData = {
+        name: `Outfit ${randomIndex}`, // Use a placeholder name or another field if available
+        url: data.img
+      };
+      setCurrentPerson(formattedData);
+      setLoadedIndexes([...loadedIndexes, randomIndex]);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setIsLoading(false);
+    }
+  };
   const childRefs = useRef(people.map(() => React.createRef()));
 
   const swiped = (direction, nameToDelete) => {
-    console.log('Removing: ' + nameToDelete);
+    console.log("Removing: " + nameToDelete);
   };
 
   const outOfFrame = (name) => {
-    console.log(name + ' left the screen!');
+    console.log(name + " left the screen!");
   };
 
   // const swipe = (dir) => {
@@ -42,58 +72,105 @@ const TinderCards = () => {
   //     childRefs.current[index].current.swipe(dir); // Swipe the card!
   //   }
   // };
-  const swipe = (dir) => {
-    if (people.length > 0) {
-      const currentIndex = people.length - 1;
-      const cardRef = childRefs.current[currentIndex];
-      if (cardRef && cardRef.current) {
-        cardRef.current.swipe(dir); // Swipe the card!
+  // 
+  
+  const handleSwipe = (dir) => {
+    if (dir === 'right')
+    {
+      setRightSwipeCount(prevCount => prevCount + 1);
+      setRightSwipedOutfits([...rightSwipedOutfits, currentPerson]);
+      if (rightSwipeCount + 1 === 5) {
+        setIsModalOpen(true);
+        setRightSwipeCount(0)
+        // setRightSwipedOutfits([])
       }
     }
+    fetchRandomPerson();
   };
 
+  useEffect(() => {
+    fetchRandomPerson();
+  }, []);
+
   const handleSwipeLeft = () => {
-    swipe('left');
+    handleSwipe("left");
   };
 
   const handleSwipeRight = () => {
-    swipe('right');
+    handleSwipe("right");
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setRightSwipedOutfits([])
   };
 
   return (
     <div className="swipeDisplay">
-      <div className='swipeButtons__left' onClick={handleSwipeLeft}>
-      Swipe Left
-    </div> 
-    <div className='tinderCards'>
-    
-    <div className='tinderCards__cardContainer'>
-      {people.map((person, index) => (
-        <TinderCard
-          ref={childRefs.current[index]}
-          className='swipe'
-          key={person.name}
-          onSwipe={(dir) => swiped(dir, person.name)}
-          onCardLeftScreen={() => outOfFrame(person.name)}
-          preventSwipe={['up', 'down']}
-        >
-          <div
-            style={{ backgroundImage: `url(${person.url})` }}
-            className='card'
-          >
-            <h3>{person.name}</h3>
-          </div>
-        </TinderCard>
-      ))}
+      
+      <div className="swipeButtons__left" onClick={handleSwipeLeft}>
+      <ArrowBackIcon />
+      </div>
+      <div className="tinderCards">
+        <div className="tinderCards__cardContainer">
+          {/* {people.map((person, index) => (
+            <TinderCard
+              ref={childRefs.current[index]}
+              className="swipe"
+              key={person.name}
+              onSwipe={(dir) => swiped(dir, person.name)}
+              onCardLeftScreen={() => outOfFrame(person.name)}
+              preventSwipe={["up", "down"]}
+            >
+              <div
+                style={{ backgroundImage: `url(${person.url})` }}
+                className="card"
+              >
+                <h3>{person.name}</h3>
+              </div>
+            </TinderCard>
+          ))} */}
+          {currentPerson && (
+            <TinderCard
+              className='swipe'
+              key={currentPerson.name} // Ensure unique key for each card
+              onSwipe={(dir) => handleSwipe(dir)}
+              preventSwipe={['up', 'down']}
+            >
+              <div
+                style={{
+                  backgroundImage: `url(${currentPerson.url})`,
+                }}
+                className='card'
+              >
+                <h3>{currentPerson.name}</h3>
+              </div>
+            </TinderCard>
+          )}
+          {isLoading && <div>Loading...</div>}
+        </div>
+      </div>
+      <div className="swipeButtons__right" onClick={handleSwipeRight}>
+      <ArrowForwardIcon />
+      </div>
+      <Modal open={isModalOpen} onClose={handleCloseModal}>
+        <Box className="modalBox">
+          <h2>Right Swiped Outfits</h2>
+          <div className="swipedOutfitsContainer">
+            {rightSwipedOutfits.map((outfit, index) => (
+              <div key={index} className="swipedOutfit">
+                <img src={outfit.url} alt={outfit.name} />
+                {/* <h3>{outfit.name}</h3> */}
+                <p>Add to wishlist</p>
+              </div>
+              ))}
+              </div>
+              <Button onClick={handleCloseModal}>Close</Button>
+        </Box>
+
+      </Modal>
     </div>
-   
-  </div>
-  <div className='swipeButtons__right' onClick={handleSwipeRight}>
-   Swipe Right
- </div>
- 
- </div>
-);
+  );
 };
 
 export default TinderCards;

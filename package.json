@@ -15,8 +15,11 @@
     "@mui/icons-material": "^5.16.0",
     "@mui/material": "^5.16.0",
     "@react-spring/web": "^9.7.3",
+    "express": "^4.19.2",
+    "mysql": "^2.18.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^6.24.1",
     "react-tinder-card": "^1.6.4"
   },
   "devDependencies": {
@@ -28,5 +31,10 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
     "vite": "^5.3.1"
-  }
+  },
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "main": "vite.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

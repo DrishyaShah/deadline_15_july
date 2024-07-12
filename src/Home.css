@@ -1,0 +1,57 @@
+/* Home.css */
+
+.home-container {
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  h1 {
+    font-family: 'Pacifico', cursive;
+    /* color: #ff3f6c; */
+    margin-bottom: 40px;
+  }
+  
+  .buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+  }
+  
+  .funky-button {
+    background-color: #ff3f6c;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 30px;
+    cursor: pointer;
+    border-radius: 30px;
+    transition: background-color 0.3s, transform 0.3s;
+    font-family: 'Pacifico', cursive;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px; 
+  }
+  
+  .funky-button:hover {
+    background-color: #e63950;
+    transform: scale(1.1);
+  }
+  .description-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Pacifico', cursive;
+    color: #333;
+    text-align: center;
+  }
+  
+  .description-card p {
+    margin: 0;
+  }
+
+  .feature-container
+  {
+    margin: 40px !important; 
+  }
