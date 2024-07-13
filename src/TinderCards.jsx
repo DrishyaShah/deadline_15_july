@@ -4,8 +4,27 @@ import "./TinderCards.css";
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Switch from '@mui/material/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const theme = createTheme({
+  components: {
+    MuiSwitch: {
+      styleOverrides: {
+        switchBase: {
+          color: '#1976d2',
+        },
+        track: {
+          backgroundColor: '#1976d2',
+        },
+      },
+    },
+  },
+});
+
 const TinderCards = () => {
   const [people, setPeople] = useState([]);
   const [currentPerson, setCurrentPerson] = useState(null);
@@ -14,6 +33,7 @@ const TinderCards = () => {
   const [rightSwipeCount, setRightSwipeCount] = useState(0);
   const [rightSwipedOutfits, setRightSwipedOutfits] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isToggleOn, setIsToggleOn] = useState(true); // State for toggle switch
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -32,22 +52,31 @@ const TinderCards = () => {
 
   //   fetchData();
   // }, []);
-  const fetchRandomPerson = async () => {
+  const fetchRandomPerson = async (toggleState) => {
     try {
+      console.log(toggleState);
       setIsLoading(true);
-      let randomIndex;
-      do {
-        randomIndex = Math.floor(Math.random() * 8090); // Adjust 10 according to your data size
-      } while (loadedIndexes.includes(randomIndex));
+      // let randomIndex;
+      // do {
+      //   randomIndex = Math.floor(Math.random() * 8090); // Adjust 10 according to your data size
+      // } while (loadedIndexes.includes(randomIndex));
 
-      const response = await fetch(`http://localhost:4000/outfits/${randomIndex}`);
+      //const response = await fetch(`http://localhost:5001/outfits`);
+      const response = await fetch(`http://localhost:5001/outfits`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ isToggleOn: toggleState })
+      });
       const data = await response.json();
       const formattedData = {
-        name: `Outfit ${randomIndex}`, // Use a placeholder name or another field if available
+        SrNo: data.SrNo,
+        name: data.name, // Use a placeholder name or another field if available
         url: data.img
       };
       setCurrentPerson(formattedData);
-      setLoadedIndexes([...loadedIndexes, randomIndex]);
+      //setLoadedIndexes([...loadedIndexes, randomIndex]);
       setIsLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -73,19 +102,73 @@ const TinderCards = () => {
   //   }
   // };
   // 
-  
-  const handleSwipe = (dir) => {
+  // const fetchSimilarOutfits=(item) => 
+  // {
+  //   recommend(formattedData.name)
+  // }
+  const fetchRecommendations = async (item) => {
+    // Make an API call to fetch recommendations for the right-swiped outfits
+    // Example fetch call:
+    const response = await fetch('http://localhost:5001/get-recommendations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ item }),
+    });
+    const data = await response.json();
+
+    console.log('Recommendations:', data);
+    // Handle the recommendations data as needed
+    
+    // Extract item IDs from recommendations
+    const recommendedSrNo= data.similar_items.map(recommendation=>recommendation.SrNo);
+
+    // Update swipeorder of recommended items
+    await fetch('http://localhost:5001/update-swipeorder', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ SrNo: recommendedSrNo, swipeorder: 1 }),
+    });
+  };
+
+  const updateSwipeOrder = async (SrNo,swipeorder) => {
+    // Make an API call to fetch recommendations for the right-swiped outfits
+    // Example fetch call:
+    const response = await fetch('http://localhost:5001/update-swipeorder', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ SrNo, swipeorder }),
+    });
+    // const data = await response.json();
+
+    // console.log('Swipeorder:', data);
+    // Handle the recommendations data as needed
+  };
+
+
+  const handleSwipe = async (dir) => {
+    let swipeorder=-1;
+    
+    await updateSwipeOrder(currentPerson.SrNo,swipeorder);
     if (dir === 'right')
     {
+      
       setRightSwipeCount(prevCount => prevCount + 1);
       setRightSwipedOutfits([...rightSwipedOutfits, currentPerson]);
+      //console.log(currentPerson.name)
+      await fetchRecommendations(currentPerson.name);
       if (rightSwipeCount + 1 === 5) {
         setIsModalOpen(true);
         setRightSwipeCount(0)
         // setRightSwipedOutfits([])
       }
     }
-    fetchRandomPerson();
+    fetchRandomPerson(isToggleOn);
   };
 
   useEffect(() => {
@@ -105,9 +188,43 @@ const TinderCards = () => {
     setRightSwipedOutfits([])
   };
 
+  // const handleToggle = () => {
+  //   console.log(isToggleOn);
+  //   setIsToggleOn( isToggleOn=> !isToggleOn);
+  //   console.log(isToggleOn);
+  // };
+  
+  const handleToggle = () => {
+    setIsToggleOn(prevToggle => !prevToggle); // Use functional form to update state
+    fetchRandomPerson(!isToggleOn);
+  };
+  
+  useEffect(() => {
+    // Fetch data or perform actions based on toggle state change
+    console.log("Toggle state changed:", isToggleOn);
+  }, [isToggleOn]); // useEffect hook dependency on isToggleOn state
+
+useEffect(() => {
+    fetchRandomPerson();
+  }, [isToggleOn]);
+
   return (
-    <div className="swipeDisplay">
-      
+    
+       <ThemeProvider theme={theme}>
+      <div className="swipeDisplay">
+        <div className="toggleContainer">
+          <FormControlLabel
+            control={
+              <Switch
+                checked={isToggleOn}
+                onChange={handleToggle}
+                name="toggleSwitch"
+                color="primary"
+              />
+            }
+            label={isToggleOn ? "Toggle On" : "Toggle Off"}
+          />
+        </div>
       <div className="swipeButtons__left" onClick={handleSwipeLeft}>
       <ArrowBackIcon />
       </div>
@@ -170,6 +287,7 @@ const TinderCards = () => {
 
       </Modal>
     </div>
+    </ThemeProvider>
   );
 };
 

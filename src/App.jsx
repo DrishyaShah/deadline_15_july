@@ -8,6 +8,8 @@ import { Routes, Route } from 'react-router-dom';
 import Home from './Home'
 
 import TinderCards from './TinderCards'
+import FandomPage from './FandomPage'
+import OrderCards from './OrderCards'
 
 function App() {
  
@@ -17,6 +19,8 @@ function App() {
       <Route path="/" element={<Layout />}>
       <Route index element={<Home />} />
       <Route path="swipe" element={ <TinderCards />} />
+      <Route path="fandom" element={<FandomPage/>}/>
+      <Route path="orders" element={<OrderCards/>}/>
       </Route>
     </Routes>
   )

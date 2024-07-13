@@ -1,6 +1,20 @@
 import express from 'express';
 import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+import pool from './config/db.js';
+import cors from 'cors';
+import axios from 'axios';
+dotenv.config();
 const app = express();
+app.use(express.json());
+app.use(cors({
+  origin: 'http://localhost:5173'
+}))
+
+pool.getConnection((err, conn) => 
+{
+if (err) throw err;
+});
 
 const clientId = '1013257733143791'; // Replace with your actual client ID
 const clientSecret = '187f5e04b8724218a54af4fc10055553'; // Replace with your actual client secret
@@ -10,9 +24,9 @@ const page_id="345383718665007"
 let accessToken=null;
 const hashtag = '#peace';
 // Serve the HTML page
-app.get('/', (req, res) => {
+app.get('/post', (req, res) => {
   res.send(`
-    <html>
+    <html> 
       <body>
         <h1>Instagram OAuth Login</h1>
         <a href="/auth/instagram">Login with Instagram</a>
@@ -68,19 +82,19 @@ const getAccessToken = async (code) => {
 };
 
 
-const getUserAccounts = async (accessToken) => {
-    try {
-      const response = await fetch(`https://graph.facebook.com/v20.0/me/accounts?access_token=${accessToken}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch user accounts');
-      }
-      const data = await response.json();
-      console.log('User Accounts:', data);
-      return data;
-    } catch (error) {
-      console.error('Error fetching user accounts:', error.message);
-    }
-  };
+// const getUserAccounts = async (accessToken) => {
+//     try {
+//       const response = await fetch(`https://graph.facebook.com/v20.0/me/accounts?access_token=${accessToken}`);
+//       if (!response.ok) {
+//         throw new Error('Failed to fetch user accounts');
+//       }
+//       const data = await response.json();
+//       console.log('User Accounts:', data);
+//       return data;
+//     } catch (error) {
+//       console.error('Error fetching user accounts:', error.message);
+//     }
+//   };
 
 const getUserPosts=async(accessToken)=>{
   try{
@@ -103,6 +117,7 @@ const getUserPosts=async(accessToken)=>{
     }
     return posts.find(post => post.caption && post.caption.includes(hashtag));
   };
+
   
   const calculatePoints = (likeCount) => {
     // Define your point calculation logic here. For example, 1 like = 1 point.
@@ -132,6 +147,110 @@ const getUserPosts=async(accessToken)=>{
     getUserPosts(accessToken);
   })
 
+  app.post('/outfits', async (req, res) => {
+    const { isToggleOn } = req.body;
+    console.log('Received isToggleOn:', isToggleOn);
+    try {
+      let query;
+      if (isToggleOn) {
+        query = `SELECT SrNo, name, img FROM outfits WHERE swipeorder=1`;
+      } else {
+        query = `SELECT SrNo, name, img FROM outfits WHERE swipeorder = 0`;
+      }
+      
+      pool.query(query, (err, results) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send('Database query failed');
+         return;
+        }
+  
+        if (results.length > 0) {
+          
+          const randomItem = results[Math.floor(Math.random() * results.length)];
+          console.log(randomItem);
+          res.json(randomItem);
+
+          
+          // else
+          // {
+          // const randomItem = results[0];
+          // console.log(randomItem);
+          // res.json(randomItem);
+          // }
+          
+        } else {
+          res.json(null);
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+     
+// app.get('/outfits', (req, res) => {
+//     const sql = 'SELECT img, name, SrNo FROM outfits';
+//     pool.query(sql, (err, results) => {
+//         if (err) {
+//             res.status(500).send('Database query failed');
+//             throw err;
+//         }
+//         res.json(results);
+//     });
+// });
+
+app.get('/outfits/:index', (req, res) => {
+    const { index } = req.params;
+    const sql = 'SELECT img, name, SrNo FROM outfits WHERE `SrNo` = ?';
+    pool.query(sql, [index], (err, results) => {
+        if (err) {
+            res.status(500).send('Database query failed');
+            throw err;
+        }
+        if (results.length === 0) {
+            res.status(404).send('Outfit not found');
+        } else {
+            res.json(results[0]);
+        }
+    });
+});
+
+// interaction with flask api
+app.post('/get-recommendations', async (req, res) => {
+  const { item } = req.body;
+  try {
+      const response = await axios.post('http://localhost:5000/recommend', { item });
+      res.json(response.data);
+
+  } catch (error) {
+      res.status(500).send('Error getting recommendations');
+  }
+});
+
+app.post('/update-swipeorder', (req, res) => {
+  const { SrNo, swipeorder } = req.body;
+
+  const query = 'UPDATE outfits SET swipeorder = ? WHERE SrNo IN (?)';
+  pool.query(query, [swipeorder, SrNo], (err, result) => {
+    if (err) {
+      res.status(500).send('Error updating swipe order');
+      return;
+    }
+    res.send('Swipe orders updated successfully');
+  });
+});
+
+app.get('/fandomoutfits', (req, res) => {
+    pool.query('SELECT * FROM FandomOutfit ORDER BY uploaddate DESC', (err, results) => {
+    if (err) {
+      console.error('Error fetching data:', err);
+      res.status(500).send('Error fetching data');
+      return;
+    }
+    res.json(results);
+  });
+});
 app.listen(5001, () => {
   console.log('Server running on port 5001');
 });
