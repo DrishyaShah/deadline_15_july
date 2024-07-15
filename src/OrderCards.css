@@ -1,0 +1,50 @@
+.purchased-items {
+    display: flex;
+    justify-content:center;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    margin-top:40px;
+  }
+  
+  .purchased-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    width: 300px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .purchased-card-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+  }
+  
+  .purchased-card-content {
+    padding: 10px;
+  }
+  
+  .purchased-card-content h2 {
+    font-size: 1.2em;
+    margin: 0;
+  }
+  
+  .purchased-card-content p {
+    font-size: 1em;
+    margin: 10px 0;
+  }
+  
+  .purchased-card-content button {
+    background-color:#ff3f6c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  .purchased-card-content button:hover {
+    background-color: #0056b3;
+  }
+  

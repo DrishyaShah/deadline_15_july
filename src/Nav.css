@@ -1,0 +1,59 @@
+/* Nav.css */
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&display=swap');
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    padding: 10px 20px;
+    /* font-family: 'Arial, sans-serif'; */
+    
+    width: 100%;
+  
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-left {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo {
+    height: 50px;
+    margin-right: 20px;
+    margin-bottom:18px;
+  }
+  
+  .heading {
+    font-size: 1.75em;
+    color: #ff3f6c;
+    
+  }
+  
+  .navbar-right {
+    display: flex;
+    align-items: center;
+  }
+  
+  .login-button {
+    background-color: #ff3f6c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-right: 15px !important; /* Added right margin */
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .login-button:hover {
+    background-color: #e63950;
+    color: white;
+  }
+  
+  .navbar-right {
+    display: flex;
+    align-items: center;
+    padding-right: 15px; /* Added right padding */
+  }
