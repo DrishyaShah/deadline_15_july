@@ -1,15 +1,37 @@
 .card {
     position: relative;
     width: 600px;
-    max-width: 400px; 
-  height: 550px; 
+    width:350px;
+    /* max-width: 400px;  */
+    height: 550px;
+    height:500px; 
     border-radius: 20px;
     background-size: cover;
     background-position: center;
     box-shadow: 0px 18px 53px 0px rgba(0, 0, 0, 0.3);
     
   }
-  
+  .card-name 
+  {
+    height: 100px;
+    width: 350px;
+    margin-top:510px;
+    border-radius: 20px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    box-shadow: 0px 18px 53px 0px rgba(0, 0, 0, 0.3);
+
+  }
+  .card-name p{
+    margin:0;
+  }
+  /* .card img{
+    width:100%;
+    height:80%;
+    object-fit:cover;
+  } */
   .card > h3 {
     position: absolute;
     bottom: 10px;
@@ -21,8 +43,9 @@
   
   .tinderCards__cardContainer {
     display: flex;
+    /* flex-direction: column; */
     justify-content: center;
-    margin-top: 5vh;
+    /* margin-top: 5vh; */
   }
   .tinderCards
   {
@@ -46,17 +69,19 @@
   */
   position: absolute;
   top: 600px;
+  width:100px;
   transform: translateY(-50%);
   cursor: pointer;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: #ff3f6c;
+  color:white;
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   text-align: center;
-  padding: 10px;
+  /* padding: 10px; */
   margin: 20px;
 }
 .swipeButtons__left {
-  left: 420px; /* Adjust left position as needed */
+  left: 430px; /* Adjust left position as needed */
 }
 
 .swipeButtons__right {
@@ -70,7 +95,7 @@
 .swipeDisplay {
   display: flex !important; 
   flex-direction:column;
-  justify-content: space-between !important;
+  justify-content: space-around!important;
   width: 100% !important;
   align-items: center;
   position:relative;
@@ -78,7 +103,7 @@
 .toggleContainer {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
 }
 
 .modalBox {

@@ -9,16 +9,24 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Navbar from './Navbar'
 
 const theme = createTheme({
   components: {
     MuiSwitch: {
       styleOverrides: {
         switchBase: {
-          color: '#1976d2',
+          '&.Mui-checked': {
+            color: '#ff3f6c',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 63, 108, 0.08)',
+            },
+          },
         },
         track: {
-          backgroundColor: '#1976d2',
+          '&.Mui-checked': {
+            backgroundColor: '#ff3f6c',
+          },
         },
       },
     },
@@ -33,7 +41,7 @@ const TinderCards = () => {
   const [rightSwipeCount, setRightSwipeCount] = useState(0);
   const [rightSwipedOutfits, setRightSwipedOutfits] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isToggleOn, setIsToggleOn] = useState(true); // State for toggle switch
+  const [isToggleOn, setIsToggleOn] = useState(false); // State for toggle switch
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -73,7 +81,9 @@ const TinderCards = () => {
       const formattedData = {
         SrNo: data.SrNo,
         name: data.name, // Use a placeholder name or another field if available
-        url: data.img
+        url: data.img,
+        tag:data.tag||null,
+        
       };
       setCurrentPerson(formattedData);
       //setLoadedIndexes([...loadedIndexes, randomIndex]);
@@ -125,12 +135,12 @@ const TinderCards = () => {
     const recommendedSrNo= data.similar_items.map(recommendation=>recommendation.SrNo);
 
     // Update swipeorder of recommended items
-    await fetch('http://localhost:5001/update-swipeorder', {
+    await fetch('http://localhost:5001/update-swipeorder-tag', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ SrNo: recommendedSrNo, swipeorder: 1 }),
+      body: JSON.stringify({ SrNo: recommendedSrNo, swipeorder: 1 ,tag: item}),
     });
   };
 
@@ -209,7 +219,8 @@ useEffect(() => {
   }, [isToggleOn]);
 
   return (
-    
+        <>
+        <Navbar/>
        <ThemeProvider theme={theme}>
       <div className="swipeDisplay">
         <div className="toggleContainer">
@@ -219,14 +230,15 @@ useEffect(() => {
                 checked={isToggleOn}
                 onChange={handleToggle}
                 name="toggleSwitch"
-                color="primary"
+                color='#ff3f6c'
               />
             }
-            label={isToggleOn ? "Toggle On" : "Toggle Off"}
+            label={isToggleOn ? "Find Similar On" : "Find Similar Off"}
           />
         </div>
       <div className="swipeButtons__left" onClick={handleSwipeLeft}>
-      <ArrowBackIcon />
+      {/* <ArrowBackIcon /> */}
+      <p>Dislike</p>
       </div>
       <div className="tinderCards">
         <div className="tinderCards__cardContainer">
@@ -256,19 +268,27 @@ useEffect(() => {
             >
               <div
                 style={{
-                  backgroundImage: `url(${currentPerson.url})`,
+                   backgroundImage: `url(${currentPerson.url})`,
                 }}
                 className='card'
               >
-                <h3>{currentPerson.name}</h3>
+                {/* <img src={currentPerson.url} alt={currentPerson.name} /> */}
+                {/* <h3>{currentPerson.name}</h3> */}
               </div>
             </TinderCard>
+           
           )}
           {isLoading && <div>Loading...</div>}
+          {currentPerson && (<div className="card-name">
+            <p>{currentPerson.name}</p>
+            {currentPerson.tag && <p>Because you liked:<a href={currentPerson.url}>{currentPerson.tag}</a> </p>}
+          </div>)}
+          
         </div>
       </div>
       <div className="swipeButtons__right" onClick={handleSwipeRight}>
-      <ArrowForwardIcon />
+      {/* <ArrowForwardIcon /> */}
+      <p>Like</p>
       </div>
       <Modal open={isModalOpen} onClose={handleCloseModal}>
         <Box className="modalBox">
@@ -288,6 +308,7 @@ useEffect(() => {
       </Modal>
     </div>
     </ThemeProvider>
+    </>
   );
 };
 

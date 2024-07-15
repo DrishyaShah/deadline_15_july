@@ -6,7 +6,7 @@
   }
   
   h1 {
-    font-family: 'Pacifico', cursive;
+    font-family: 'Roboto', sans-serif;
     /* color: #ff3f6c; */
     margin-bottom: 40px;
   }
@@ -26,7 +26,7 @@
     cursor: pointer;
     border-radius: 30px;
     transition: background-color 0.3s, transform 0.3s;
-    font-family: 'Pacifico', cursive;
+    font-family: 'Roboto', sans-serif;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     margin-bottom: 20px; 
   }
@@ -42,7 +42,7 @@
     padding: 20px;
     width: 300px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-family: 'Pacifico', cursive;
+    font-family: 'Roboto', sans-serif;
     color: #333;
     text-align: center;
   }

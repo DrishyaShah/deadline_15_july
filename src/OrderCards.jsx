@@ -36,7 +36,7 @@ const OrderCards = () => {
     // Handle the post action here
     console.log(`Post item with id: ${itemId}`);
     console.log('Post action triggered');
-    window.location.href = 'http://localhost:5001/post';
+    window.location.href = 'https://www.instagram.com/diyashah28292024/';//'http://localhost:5001/post';
   };
 
   return (

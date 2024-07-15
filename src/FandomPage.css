@@ -6,6 +6,10 @@
     padding-left:5rem;
     padding-right:5rem;
 }
+.category-cards {
+  display: flex;
+  flex-wrap: wrap;
+}
 .card-fandom {
     width: 200px;
     height: 250px;

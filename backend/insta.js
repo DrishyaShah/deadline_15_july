@@ -24,12 +24,50 @@ const page_id="345383718665007"
 let accessToken=null;
 const hashtag = '#peace';
 // Serve the HTML page
-app.get('/post', (req, res) => {
+app.get('/', (req, res) => {
   res.send(`
-    <html> 
+    <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+          }
+          .container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          }
+          h1 {
+            color: #333333;
+            margin-bottom: 20px;
+          }
+          a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #405de6;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+          }
+          a:hover {
+            background-color: #3b55c5;
+          }
+        </style>
+      </head>
       <body>
-        <h1>Instagram OAuth Login</h1>
-        <a href="/auth/instagram">Login with Instagram</a>
+        <div class="container">
+          <h1>Instagram OAuth Login</h1>
+          <a href="/auth/instagram">Login with Instagram</a>
+        </div>
       </body>
     </html>
   `);
@@ -53,8 +91,22 @@ app.get('/auth/instagram/callback', async (req, res) => {
   try {
      accessToken = await getAccessToken(authorizationCode);
      console.log(`Access Token: ${accessToken}`)
-     res.redirect("https://www.instagram.com/");
-    //res.json({ accessToken });
+     const userDetails = await getUserDetails(accessToken);
+
+     //Save user details to database
+     pool.query(
+      'INSERT INTO UsersInsta (UserId, UserName) VALUES (?, ?) ON DUPLICATE KEY UPDATE UserName = VALUES(UserName)',
+      [userDetails.id, userDetails.name],
+      (err, results) => {
+        if (err) {
+          console.error('Error saving user details:', err);
+          return res.status(500).send('Error saving user details');
+        }
+        console.log('User details saved:', results);
+        //res.redirect("https://www.instagram.com/diyashah28292024/");
+        res.redirect("http://localhost:5173");
+      }
+    );
   } catch (error) {
     res.status(500).send('Error exchanging authorization code for access token');
   }
@@ -82,19 +134,19 @@ const getAccessToken = async (code) => {
 };
 
 
-// const getUserAccounts = async (accessToken) => {
-//     try {
-//       const response = await fetch(`https://graph.facebook.com/v20.0/me/accounts?access_token=${accessToken}`);
-//       if (!response.ok) {
-//         throw new Error('Failed to fetch user accounts');
-//       }
-//       const data = await response.json();
-//       console.log('User Accounts:', data);
-//       return data;
-//     } catch (error) {
-//       console.error('Error fetching user accounts:', error.message);
-//     }
-//   };
+const getUserDetails = async (accessToken) => {
+    try {
+      const response = await fetch(`https://graph.facebook.com/v20.0/me?fields=id,name&access_token=${accessToken}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user accounts');
+      }
+      const data = await response.json();
+      console.log('User Details:', data);
+      return data;
+    } catch (error) {
+      console.error('Error fetching user accounts:', error.message);
+    }
+  };
 
 const getUserPosts=async(accessToken)=>{
   try{
@@ -113,9 +165,9 @@ const getUserPosts=async(accessToken)=>{
   const findPostByHashtag = (posts, hashtag) => {
     if (!Array.isArray(posts)) {
       console.error('Expected posts to be an array, got:', typeof posts);
-      return null;
+      return [];
     }
-    return posts.find(post => post.caption && post.caption.includes(hashtag));
+    return posts.filter(post => post.caption && post.caption.includes(hashtag));
   };
 
   
@@ -126,11 +178,27 @@ const getUserPosts=async(accessToken)=>{
 
   app.get('/get-likes', async (req, res) => {
     try {
+      const userDetails = await getUserDetails(accessToken);
       const posts = await getUserPosts(accessToken);
-      const post = findPostByHashtag(posts, hashtag);
-      if (post) {
-        const points = calculatePoints(post.like_count);
-        res.json({ hashtag, likeCount: post.like_count, points });
+      const filteredPosts = findPostByHashtag(posts, hashtag);
+      console.log(filteredPosts.length)
+      if (filteredPosts.length > 0) {
+        const totalLikes = filteredPosts.reduce((sum, post) => sum + post.like_count, 0);
+        const points = calculatePoints(totalLikes);
+
+        //Update user points in database
+        pool.query(
+          'UPDATE UsersInsta SET points = ? WHERE UserId= ?',
+          [points, userDetails.id],
+          (err, results) => {
+            if (err) {
+              console.error('Error updating points:', err);
+              return res.status(500).json({ message: 'Error updating points', error: err.message });
+            }
+            console.log('Points updated:', results);
+            res.json({ hashtag, totalLikes, points });
+          }
+        );
       } else {
         res.status(404).json({ message: `No post found with hashtag ${hashtag}.` });
       }
@@ -139,8 +207,23 @@ const getUserPosts=async(accessToken)=>{
     }
   });
 
-  app.get('/useraccount', async (req, res) => {
-    getUserAccounts(accessToken);
+  // Add this endpoint in your backend
+app.get('/userpoints/:username', (req, res) => {
+  const username = req.params.username;
+  pool.query('SELECT points FROM UsersInsta WHERE UserName = ?', [username], (err, results) => {
+    if (err) {
+      console.error('Error fetching user points:', err);
+      return res.status(500).send('Error fetching user points');
+    }
+    if (results.length === 0) {
+      return res.status(404).send('User not found');
+    }
+    res.json({ points: results[0].points });
+  });
+});
+
+  app.get('/userdetails', async (req, res) => {
+    getUserDetails(accessToken);
   });
 
   app.get('/userpost',async(req,res)=>{
@@ -153,7 +236,7 @@ const getUserPosts=async(accessToken)=>{
     try {
       let query;
       if (isToggleOn) {
-        query = `SELECT SrNo, name, img FROM outfits WHERE swipeorder=1`;
+        query = `SELECT SrNo, name, img, tag, tagimg FROM outfits WHERE swipeorder=1`;
       } else {
         query = `SELECT SrNo, name, img FROM outfits WHERE swipeorder = 0`;
       }
@@ -240,6 +323,20 @@ app.post('/update-swipeorder', (req, res) => {
     res.send('Swipe orders updated successfully');
   });
 });
+
+app.post('/update-swipeorder-tag', (req, res) => {
+  const { SrNo, swipeorder, tag } = req.body;
+
+  const query = 'UPDATE outfits SET swipeorder = ?, tag = ? WHERE SrNo IN (?)';
+  pool.query(query, [swipeorder, tag, SrNo], (err, result) => {
+    if (err) {
+      res.status(500).send('Error updating swipe order and tag');
+      return;
+    }
+    res.send('Swipe orders and tags updated successfully');
+  });
+});
+
 
 app.get('/fandomoutfits', (req, res) => {
     pool.query('SELECT * FROM FandomOutfit ORDER BY uploaddate DESC', (err, results) => {
