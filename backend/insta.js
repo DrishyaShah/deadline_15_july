@@ -39,6 +39,7 @@ app.get('/', (req, res) => {
             margin: 0;
           }
           .container {
+            width:350px;
             text-align: center;
             background-color: #ffffff;
             padding: 20px;
@@ -48,7 +49,29 @@ app.get('/', (req, res) => {
           h1 {
             color: #333333;
             margin-bottom: 20px;
+            text-align:center;
           }
+            .input-container {
+        margin-bottom: 15px;
+        text-align: left;
+      }
+      .input-container label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333333;
+      }
+      .input-container input {
+        width: calc(100% - 22px);
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      .or-divider {
+        margin: 20px 0;
+        font-weight: bold;
+        color: #333333;
+      }
           a {
             display: inline-block;
             padding: 10px 20px;
@@ -65,7 +88,16 @@ app.get('/', (req, res) => {
       </head>
       <body>
         <div class="container">
-          <h1>Instagram OAuth Login</h1>
+          <h1>Login</h1>
+          <div class="input-container">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+      </div>
+      <div class="input-container">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+      </div>
+      <div class="or-divider">or</div>
           <a href="/auth/instagram">Login with Instagram</a>
         </div>
       </body>
