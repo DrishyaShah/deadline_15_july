@@ -3,8 +3,7 @@ With the rise in so many shopping platforms these days, Gen Z tends to be less l
 For that, we propose two brand new features
 1.) Fashionable Swipe
 2.) Fandom Page
-
-## Fashionable Swipe: 
+# Fashionable Swipe: 
 
 Fashionable Swipe is a tinder-inspired feature wherein users can browse outfits by swiping them left or right, much like they would on a dating site. 
 This mechanism mimics browsing through a rack of clothes, creating a touch-and-feel experience.  
