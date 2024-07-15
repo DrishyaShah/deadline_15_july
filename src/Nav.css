@@ -1,5 +1,5 @@
 /* Nav.css */
-
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&display=swap');
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -7,7 +7,7 @@
     background-color: #333;
     padding: 10px 20px;
     /* font-family: 'Arial, sans-serif'; */
-    font-family: 'Pacifico', cursive;
+    
     width: 100%;
   
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -21,12 +21,13 @@
   .logo {
     height: 50px;
     margin-right: 20px;
+    margin-bottom:18px;
   }
   
   .heading {
     font-size: 1.75em;
     color: #ff3f6c;
-    font-family: 'Pacifico', cursive;
+    
   }
   
   .navbar-right {

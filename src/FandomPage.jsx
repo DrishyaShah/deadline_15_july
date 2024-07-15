@@ -69,7 +69,7 @@ const FandomPage = () => {
                   <div className="info">
                     <h3>{item.fandom}</h3>
                     <p>Original Price: {item.price}</p>
-                    <p>Discounted Price: {calculateDiscountedPrice(item.price)}</p>
+                    <p>Your Discounted Price: {calculateDiscountedPrice(item.price)}</p>
                     <button>Visit</button>
                   </div>
                 </div>

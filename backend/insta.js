@@ -22,7 +22,7 @@ const redirectUri = 'http://localhost:5001/auth/instagram/callback'; // Replace 
 const user_id="17841468108461063"
 const page_id="345383718665007" 
 let accessToken=null;
-const hashtag = '#peace';
+const hashtag = '#myntrafandomlook';
 // Serve the HTML page
 app.get('/', (req, res) => {
   res.send(`
@@ -104,6 +104,21 @@ app.get('/auth/instagram/callback', async (req, res) => {
         }
         console.log('User details saved:', results);
         //res.redirect("https://www.instagram.com/diyashah28292024/");
+        //res.redirect("http://localhost:5173");
+      }
+    );
+
+     // Update swipeorder and tag columns
+     pool.query(
+      'UPDATE Outfits SET swipeorder = 0, tag = NULL',
+      (err, results) => {
+        if (err) {
+          console.error('Error updating outfits:', err);
+          return res.status(500).send('Error updating outfits');
+        }
+        console.log('Outfits updated:', results);
+        
+        // Redirect user after successful login and update
         res.redirect("http://localhost:5173");
       }
     );
@@ -325,10 +340,10 @@ app.post('/update-swipeorder', (req, res) => {
 });
 
 app.post('/update-swipeorder-tag', (req, res) => {
-  const { SrNo, swipeorder, tag } = req.body;
+  const { SrNo, swipeorder, tag ,tagimg} = req.body;
 
-  const query = 'UPDATE outfits SET swipeorder = ?, tag = ? WHERE SrNo IN (?)';
-  pool.query(query, [swipeorder, tag, SrNo], (err, result) => {
+  const query = 'UPDATE outfits SET swipeorder = ?, tag = ?,tagimg=? WHERE SrNo IN (?)';
+  pool.query(query, [swipeorder, tag, tagimg, SrNo], (err, result) => {
     if (err) {
       res.status(500).send('Error updating swipe order and tag');
       return;

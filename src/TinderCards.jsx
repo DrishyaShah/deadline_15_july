@@ -83,6 +83,7 @@ const TinderCards = () => {
         name: data.name, // Use a placeholder name or another field if available
         url: data.img,
         tag:data.tag||null,
+        tagimg:data.tagimg||null
         
       };
       setCurrentPerson(formattedData);
@@ -140,7 +141,7 @@ const TinderCards = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ SrNo: recommendedSrNo, swipeorder: 1 ,tag: item}),
+      body: JSON.stringify({ SrNo: recommendedSrNo, swipeorder: 1 ,tag: item, tagimg:currentPerson.url}),
     });
   };
 
@@ -181,9 +182,9 @@ const TinderCards = () => {
     fetchRandomPerson(isToggleOn);
   };
 
-  useEffect(() => {
-    fetchRandomPerson();
-  }, []);
+  // useEffect(() => {
+  //   fetchRandomPerson(isToggleOn);
+  // }, []); 
 
   const handleSwipeLeft = () => {
     handleSwipe("left");
@@ -215,7 +216,7 @@ const TinderCards = () => {
   }, [isToggleOn]); // useEffect hook dependency on isToggleOn state
 
 useEffect(() => {
-    fetchRandomPerson();
+    fetchRandomPerson(isToggleOn);
   }, [isToggleOn]);
 
   return (
@@ -281,7 +282,7 @@ useEffect(() => {
           {isLoading && <div>Loading...</div>}
           {currentPerson && (<div className="card-name">
             <p>{currentPerson.name}</p>
-            {currentPerson.tag && <p>Because you liked:<a href={currentPerson.url}>{currentPerson.tag}</a> </p>}
+            {currentPerson.tag && <p>Because you liked:<a href={currentPerson.tagimg}>{currentPerson.tag}</a> </p>}
           </div>)}
           
         </div>
@@ -302,7 +303,7 @@ useEffect(() => {
               </div>
               ))}
               </div>
-              <Button onClick={handleCloseModal}>Close</Button>
+              <Button onClick={handleCloseModal}>Continue Swiping</Button>
         </Box>
 
       </Modal>

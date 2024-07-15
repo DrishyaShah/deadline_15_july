@@ -9,9 +9,9 @@ const Nav = () => {
         <img src="https://cdn.iconscout.com/icon/free/png-256/free-myntra-2709168-2249158.png?f=webp&w=256" alt="Myntra Logo" className="logo" />
         <h1 className="heading">Be Dressed to Impress</h1>
       </div>
-      <div className="navbar-right">
+      {/* <div className="navbar-right">
         <button className="login-button">Login</button>
-      </div>
+      </div> */}
     </nav>
   )
 }
