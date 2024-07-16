@@ -26,6 +26,12 @@ We have used Instagram Graph api to achieve this. First, we created an app on Me
 Additionally these points are used to offer personalised discounts to the users on each apparel.
 
 
+#Dataset
+We used the Myntra Fashion Product text dataset from Kaggle and preprocessed it to apply NLP's bag of n grams model. 
+Find the link below:
+https://www.kaggle.com/datasets/hiteshsuthar101/myntra-fashion-product-dataset
+
+
 
 
 
